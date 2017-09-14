@@ -1,6 +1,3 @@
-/**
- * Created by championswimmer on 15/06/17.
- */
 const bcrypt = require('bcrypt');
 
 function encrypt(password) {

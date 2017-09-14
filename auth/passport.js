@@ -28,7 +28,7 @@ passport.use(new LocalStrategy(
 
         User.findOne({
             where: {
-                username: username,
+                aadhaar: username,
             }
         }).then((user) => {
 

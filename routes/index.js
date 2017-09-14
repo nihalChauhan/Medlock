@@ -1,6 +1,3 @@
-/**
- * Created by championswimmer on 15/06/17.
- */
 const route = require('express').Router();
 const User = require('../db/models').User;
 const passport = require('../auth/passport');
@@ -8,18 +5,52 @@ const eli = require('../auth/utils').eli;
 const AuthToken = require('../db/models').AuthToken;
 const uid2 = require('uid2');
 const encrypt = require('../auth/utils').encrypt;
+const driver = require('bigchaindb-driver');
+
+const conn = new driver.Connection('https://test.ipdb.io/api/v1/', {
+    app_id: '4f4cf474',
+    app_key: '33eb743338ab79e021a633fe21febc46'
+});
+
 
 route.post('/signup', (req, res) => {
+    let x = new driver.Ed25519Keypair();
+/*
+    let sampleFile = req.files.scan;
+        sampleFile.mv('/files123/aad.png', function(err) {
+        if (err) return res.status(500).send(err);});
+*/
+    let tx = driver.Transaction.makeCreateTransaction(
+        { medic: 'Initial entry', imgUrl:'aad.png', datetime: new Date().toString() },
+
+        { what: 'My first BigchainDB transaction' },
+
+        [ driver.Transaction.makeOutput(
+            driver.Transaction.makeEd25519Condition(x.publicKey))
+        ],
+        x.publicKey
+    );
+
+    let txSigned = driver.Transaction.signTransaction(tx, x.privateKey);
+    conn.postTransaction(txSigned);
     User.create({
         aadhaar: req.body.aadhaar,
-        password: encrypt(req.body.password)
+        password: encrypt(req.body.password),
+        publicKey: x.publicKey,
+        privateKey: x.privateKey,
+        latest:txSigned.id
     }).then((user) => {
         res.redirect('/login.html')
     })
 });
 
+route.post('/test', (req, res) => {
+    console.log(req.files.scan);
+    res.send(req.files.scan);
+});
+
 route.post('/login', passport.authenticate('local', {
-    successRedirect: '/profile',
+    successRedirect: '/profile.html',
     failureRedirect: '/login.html'
 }));
 
@@ -32,7 +63,25 @@ route.get('/logout', (req, res) => {
 });
 
 route.get('/profile', eli('/login.html'), (req, res) => {
-    res.send(req.user);
+    res.redirect(req.user);
+});
+
+route.post('/add', eli('/login.html'), (req, res) => {
+    let tx = driver.Transaction.makeCreateTransaction(
+        { medic: req.body.mednote, imgUrl:'abc.jpg', datetime: new Date().toString() },
+
+        { what: 'New transaction' },
+
+        [ driver.Transaction.makeOutput(
+            driver.Transaction.makeEd25519Condition(req.user.publicKey))
+        ],
+        req.user.publicKey
+    );
+
+    let txSigned = driver.Transaction.signTransaction(tx, req.user.privateKey);
+    conn.postTransaction(txSigned).then(() => {
+        res.send(txSigned);
+    })
 });
 
 route.post('/token', passport.authenticate('local'), (req, res) => {

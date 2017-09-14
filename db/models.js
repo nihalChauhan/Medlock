@@ -15,9 +15,15 @@ const db = new Sequelize({
 });
 
 const User = db.define('user', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
     aadhaar: {
         type: Sequelize.STRING,
-        primaryKey: true,
+        unique: true,
+        notNull: true
     },
     password: Sequelize.STRING,
     privateKey: {

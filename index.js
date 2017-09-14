@@ -4,11 +4,12 @@ const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 const cors = require('cors');
 const passport = require('./auth/passport');
+const fileUpload = require('express-fileupload');
 
 const app = express();
 
 app.use(cors());
-
+app.use(fileUpload());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
