@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup</title>
+</head>
+<body>
+
+<form action="/signup" method="post">
+    <input name="aadhaar" type="text" placeholder="aadhaar" minlength=12 maxlength=12 required>
+    <br>
+    <input name="password" type="password" placeholder="password" required>
+    <br>
+    <input name="kyc" type="text" placeholder="kyc" required>
+    <br>
+    <input type="file" name="card" accept="image/*">
+    <br/>
+    <input type="submit" value="Sign Up">
+</form>
+
+</body>
+</html>

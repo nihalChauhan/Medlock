@@ -1,0 +1,34 @@
+{
+  "name": "medlock",
+  "version": "1.0.0",
+  "description": "A block chain based medical records vault",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nihalChauhan/Medlock.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "body-parser": "^1.17.2",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.3",
+    "express": "^4.15.3",
+    "express-session": "^1.15.3",
+    "mysql2": "^1.3.5",
+    "nodemailer": "^4.0.1",
+    "passport": "^0.3.2",
+    "passport-http-bearer": "^1.0.1",
+    "passport-local": "^1.0.0",
+    "sequelize": "^4.1.0",
+    "uid2": "0.0.3"
+  },
+  "bugs": {
+    "url": "https://github.com/nihalChauhan/Medlock/issues"
+  },
+  "homepage": "https://github.com/nihalChauhan/Medlock#readme"
+}
