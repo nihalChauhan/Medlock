@@ -6,6 +6,8 @@ const AuthToken = require('../db/models').AuthToken;
 const uid2 = require('uid2');
 const encrypt = require('../auth/utils').encrypt;
 const driver = require('bigchaindb-driver');
+const fs = require('fs');
+const path = require('path');
 
 const conn = new driver.Connection('https://test.ipdb.io/api/v1/', {
     app_id: '4f4cf474',
@@ -45,8 +47,10 @@ route.post('/signup', (req, res) => {
 });
 
 route.post('/test', (req, res) => {
-    console.log(req.files.scan);
     res.send(req.files.scan);
+    fs.writeFileSync(path.resolve('uploads') + '/' + req.files.scan.name, req.files.scan.data, function(err){
+        return console.log(err);
+    });
 });
 
 route.post('/login', passport.authenticate('local', {
