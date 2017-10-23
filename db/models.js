@@ -60,7 +60,7 @@ const AuthToken = db.define('authtoken', {
 AuthToken.belongsTo(User);
 User.hasMany(AuthToken);
 
-db.sync({force: true}).then(() => {
+db.sync({force: false}).then(() => {
     console.log('Database is synchronised');
 });
 
