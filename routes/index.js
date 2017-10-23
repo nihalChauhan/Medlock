@@ -17,13 +17,17 @@ const conn = new driver.Connection('https://test.ipdb.io/api/v1/', {
 
 route.post('/signup', (req, res) => {
     let x = new driver.Ed25519Keypair();
+    var pathName = req.body.aadhaar + '-' + Date.now() + path.extname(req.files.scan.name);
+    fs.writeFileSync(path.resolve('uploads') + '/' + pathName, req.files.scan.data, function(err){
+        return console.log(err);
+    });
 /*
     let sampleFile = req.files.scan;
         sampleFile.mv('/files123/aad.png', function(err) {
         if (err) return res.status(500).send(err);});
 */
     let tx = driver.Transaction.makeCreateTransaction(
-        { medic: 'Initial entry', imgUrl:'aad.png', datetime: new Date().toString() },
+        { medic: 'Initial entry', imgUrl:pathName, datetime: new Date().toString() },
 
         { what: 'My first BigchainDB transaction' },
 
@@ -67,12 +71,19 @@ route.get('/logout', (req, res) => {
 });
 
 route.get('/profile', eli('/login.html'), (req, res) => {
-    res.redirect(req.user);
+    conn.listOutputs(req.user.publicKey, false).then(outputs => {
+        res.send(outputs);
+    });
 });
 
 route.post('/add', eli('/login.html'), (req, res) => {
+
+    var pathName = req.user.aadhaar + '-' + Date.now() + path.extname(req.files.scan.name);
+    fs.writeFileSync(path.resolve('uploads') + '/' + pathName, req.files.scan.data, function(err){
+        return console.log(err);
+    });
     let tx = driver.Transaction.makeCreateTransaction(
-        { medic: req.body.mednote, imgUrl:'abc.jpg', datetime: new Date().toString() },
+        { medic: req.body.mednote, imgUrl:pathName, datetime: new Date().toString() },
 
         { what: 'New transaction' },
 
