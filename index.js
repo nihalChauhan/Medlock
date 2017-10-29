@@ -26,6 +26,7 @@ app.use(passport.session());
 
 app.use('/', require('./routes/index'));
 app.use('/', express.static(__dirname + "/public_static"));
+app.use('/images/', express.static(__dirname + "/uploads"));
 
 app.listen(8000, function () {
     console.log("Server started on http://localhost:8000");
