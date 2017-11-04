@@ -1,12 +1,344 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Welcome</title>
+    <title>Dashboard</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script>
+        $(document).ready(function(){
+            $.ajax({
+                url: '/profile',
+                type: 'get',
+                dataType: 'json',
+                success: function(data) {
+                    render(data.slice(1))
+                }
+            });
+
+            function formatDate(dateString)
+            {
+                var text;
+                var newDate = new Date(dateString);
+                var date = newDate.getDate();
+                var month = newDate.getMonth() + 1;
+                var year = newDate.getFullYear();
+                text = date + "/" + month + "/" + year;
+                return text;
+            }
+
+            function render(data)
+            {
+                if(data.length === 0)
+                {
+                    $(".col-md-3").remove();
+                    $("#selectedRecord").removeClass("col-md-9").addClass("col-md-12");
+
+                    var $section = $("#selectedRecord .section");
+                    $section.empty();
+                    $section.css("text-align","center");
+
+                    var $div = $("<div></div>");
+
+                    var $h3 = $("<h3></h3>").text("No records stored");
+                    $div.append($h3);
+
+                    var $button = $("<button></button>").text("Add New");
+                    $button.addClass("btn btn-default").attr("data-toggle","modal").attr("data-target","#addReport");
+                    var $i = $("<i></i>");
+                    $i.addClass("fa fa-plus");
+                    $button.prepend($i);
+                    $div.append($button);
+
+                    $div.css("display","inline-block").css("margin-top","9%");
+                    $section.append($div);
+
+                    return;
+                }
+
+                var img = document.createElement("img");
+                img.setAttribute("src","/images/" + data[0].data.imgUrl);
+                $(".col-md-9 .col-md-5").append(img);
+
+                var $h1 = $("<h1></h1>").text(data[0].data.medic);
+                var $h4 = $("<h4></h4>").text(formatDate(data[0].data.datetime));
+                $(".col-md-9 .col-md-7").append($h1,$h4);
+
+                var $ol = $("<ol></ol>");
+                for(var i=0;i<5 && i < data.length;i++)
+                {
+                    var li = createli(i,data);
+                    $ol.append(li);
+                }
+                $(".col-md-3 .section h3").after($ol);
+
+                if(data.length > 5)
+                {
+                    $ol = $("<ol></ol>");
+                    for (i = 0; i < data.length; i++)
+                    {
+                        li = createli(i, data);
+                        $ol.append(li);
+                    }
+                    $("#viewAll .modal-body").append($ol);
+
+                    var $button = $("<button></button>").text("View All");
+                    $button.addClass("btn btn-default").attr("data-toggle","modal").attr("data-target","#viewAll");
+                    $(".buttons").prepend($button);
+                }
+
+                $("li div").click(function(){
+                    var i = parseInt($(this).attr("data-id"));
+                    $(".col-md-9 .col-md-5 img").attr("src","/images/" + data[i].data.imgUrl);
+                    $(".col-md-9 .col-md-7 h1").text(data[i].data.medic);
+                    $(".col-md-9 .col-md-7 h4").text(formatDate(data[i].data.datetime));
+                    $("#viewAll").modal("hide");
+                });
+            }
+            function createli(i,data)
+            {
+                var $li = $("<li></li>");
+
+                var $div = $("<div></div>");
+                $div.attr("data-id", i);
+
+                var $p = $("<p></p>").text(data[i].data.medic);
+                $p.addClass("title");
+                $div.append($p);
+
+                $p = $("<p></p>").text(formatDate(data[i].data.datetime));
+                $p.addClass("date");
+                $div.append($p);
+
+                $li.append($div);
+                return $li;
+            }
+        });
+    </script>
+    <style>
+        *
+        {
+            box-sizing: border-box;
+        }
+        .header
+        {
+            border-bottom: 2px solid #e1e1e1;
+            margin-top: -20px;
+            padding:10px 30px;
+        }
+        .header h1
+        {
+            color: #2273ff;
+            font-size: 50px;
+            font-family: "Century Schoolbook L";
+            margin-bottom: 0;
+        }
+        span
+        {
+            color: #ff1838;
+        }
+        .row
+        {
+            margin-top: 50px;
+        }
+        .col-md-3
+        {
+            padding: 20px;
+            height:400px;
+        }
+        .col-md-3 h3
+        {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .section
+        {
+            width: 100%;
+            height:100%;
+            box-shadow: 0 0 5px 2px #e1e1e1;
+            padding: 10px;
+            position: relative;
+        }
+        #selectedRecord
+        {
+            height: 400px;
+            padding: 20px;
+        }
+        #selectedRecord .section
+        {
+            padding: 30px;
+        }
+        ol
+        {
+            list-style-position:outside;
+            padding-left: 20px;
+        }
+        li
+        {
+            font-size: 16px;
+        }
+        li div
+        {
+            width: 100%;
+            height: 100%;
+            padding: 5px 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        li div:hover
+        {
+            background-color: #bbbbbb;
+        }
+        li div:hover p
+        {
+            color:white;
+        }
+        li p
+        {
+            margin: 0;
+        }
+        .date
+        {
+            font-size: 13px;
+            color: #a1a1a1;
+        }
+        .title
+        {
+            color: black;
+        }
+        .buttons
+        {
+            position: absolute;
+            bottom:12px;
+            left:40px;
+            right:10px;
+        }
+        .buttons button
+        {
+            font-size: 12px;
+            padding: 5px;
+        }
+        button:focus, button:active
+        {
+            outline:0 !important;
+        }
+        i
+        {
+            font-size:11px;
+            margin-right: 5px;
+            color: #999999;
+        }
+        .col-md-5, .col-md-7
+        {
+            height: 100%;
+        }
+        .col-md-5
+        {
+            padding: 0;
+        }
+        .col-md-7
+        {
+            padding:20px 40px;
+        }
+        .col-md-5 img
+        {
+            width: 100%;
+            height: 100%;
+        }
+        .col-md-7 h1
+        {
+            margin-top: 0;
+        }
+        .modal-header h4
+        {
+            text-align: center;
+        }
+        .modal-body
+        {
+            padding: 20px 60px;
+        }
+        .modal-content
+        {
+            width:500px;
+            margin: 0 auto;
+        }
+        #viewAll .modal-body
+        {
+            height: 300px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+    </style>
 </head>
 <body>
-Welcome to medlock
-<br/>
-<a href="add.html"><button>Make entry</button></a>
+<div class="container">
+    <div class="header">
+        <h1><span>Med</span>Lock</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="section">
+                <h3>Records</h3>
+                <div class="buttons">
+                    <button class="btn btn-default" data-toggle="modal" data-target="#addReport" style="float:right"><i class="fa fa-plus"></i>Add New</button>
+                </div>
+            </div>
+        </div>
+        <div id="selectedRecord" class="col-md-9">
+            <div class="section">
+                <div class="col-md-5">
+                </div>
+                <div class="col-md-7">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addReport" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add new Record</h4>
+            </div>
+            <div class="modal-body">
+                <form action="http://localhost:8000/add" method="post" encType="multipart/form-data">
+                    <div class="form-group">
+                        <label for="mednote">MedNote:</label>
+                        <input type="text" class="form-control" id="mednote" name="mednote" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="report">Upload Report:</label>
+                        <input name="scan" accept="image/*" type="file" id="report" required>
+                    </div>
+                    <button type="submit" class="btn btn-default">Add</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewAll" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Past Records</h4>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
