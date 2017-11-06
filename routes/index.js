@@ -100,7 +100,7 @@ route.post('/add', eli('/login.html'), (req, res) => {
 
   let txSigned = driver.Transaction.signTransaction(tx, req.user.privateKey);
   conn.postTransaction(txSigned).then(() => {
-    res.send(txSigned);
+    res.redirect("/profile.html");
   })
 });
 
