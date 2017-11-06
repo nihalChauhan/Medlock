@@ -9,6 +9,8 @@ const driver = require('bigchaindb-driver');
 const fs = require('fs');
 const path = require('path');
 
+const utilSMS = require('../utils/utilSMS');
+
 const conn = new driver.Connection('https://test.ipdb.io/api/v1/', {
   app_id: '4f4cf474',
   app_key: '33eb743338ab79e021a633fe21febc46'
@@ -44,7 +46,17 @@ route.post('/signup', (req, res) => {
     privateKey: x.privateKey,
     latest:txSigned.id
   }).then((user) => {
-    res.redirect('/login.html')
+    utilSMS.sendSMS("+919953442721",
+      "your otp is 080808",
+      function (error, result) {
+        if (error) {
+          console.log(error);
+          res.send(error);
+        } else {
+          res.redirect('/login.html');
+        }
+      }
+    );
   })
 });
 

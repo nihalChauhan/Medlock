@@ -8,6 +8,14 @@ const fileUpload = require('express-fileupload');
 
 const app = express();
 
+const fs = require('fs');
+const dotenv = require('dotenv');
+var envConfig;
+envConfig = dotenv.parse(fs.readFileSync(__dirname + "/.env"));
+for (var k in envConfig) {
+  process.env[k] = envConfig[k]
+}
+
 app.use(cors());
 app.use(fileUpload());
 app.use(bodyParser.json());
