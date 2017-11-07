@@ -23,9 +23,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(cookieParser('my super secret'));
 app.use(expressSession({
-    secret: 'my super secret',
-    resave: false,
-    saveUninitialized: false
+  secret: 'my super secret',
+  resave: false,
+  saveUninitialized: false
 }));
 
 app.use(passport.initialize());
@@ -37,5 +37,5 @@ app.use('/', express.static(__dirname + "/public_static"));
 app.use('/images/', express.static(__dirname + "/uploads"));
 
 app.listen(8000, function () {
-    console.log("Server started on http://localhost:8000");
+  console.log("Server started on http://localhost:8000");
 });

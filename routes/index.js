@@ -16,18 +16,13 @@ const conn = new driver.Connection('https://test.ipdb.io/api/v1/', {
   app_key: '33eb743338ab79e021a633fe21febc46'
 });
 
-
 route.post('/signup', (req, res) => {
   let x = new driver.Ed25519Keypair();
   var pathName = req.body.aadhaar + '-' + Date.now() + path.extname(req.files.scan.name);
   fs.writeFileSync(path.resolve('uploads') + '/' + pathName, req.files.scan.data, function(err){
     return console.log(err);
   });
-/*
-  let sampleFile = req.files.scan;
-  sampleFile.mv('/files123/aad.png', function(err) {
-    if (err) return res.status(500).send(err);});
-*/
+
   let tx = driver.Transaction.makeCreateTransaction(
     { medic: 'Initial entry', imgUrl:pathName, datetime: new Date().toString() },
     { what: 'My first BigchainDB transaction' },
