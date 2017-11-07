@@ -42,7 +42,6 @@ const User = db.define('user', {
   }
 });
 
-
 const AuthToken = db.define('authtoken', {
   id: {
     type: Sequelize.INTEGER,
@@ -59,11 +58,23 @@ const AuthToken = db.define('authtoken', {
 AuthToken.belongsTo(User);
 User.hasMany(AuthToken);
 
+const OTP = db.define('otp', {
+  aadhaar: {
+    type: Sequelize.STRING,
+    unique: true,
+    notNull: true
+  },
+  otp: {
+    type: Sequelize.STRING,
+    notNull: true
+  }
+});
+
 db.sync({force: false}).then(() => {
   console.log('Database is synchronised');
 });
 
 module.exports = {
-  User, AuthToken
+  User, AuthToken, OTP
 };
 
