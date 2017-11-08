@@ -2,6 +2,8 @@ const route = require('express').Router();
 const User = require('../db/models').User;
 const passport = require('../auth/passport');
 const eli = require('../auth/utils').eli;
+const encryptAes = require('../auth/utils').encryptAes;
+const decryptAes = require('../auth/utils').decryptAes;
 const AuthToken = require('../db/models').AuthToken;
 const OTP = require('../db/models').OTP;
 const uid2 = require('uid2');
@@ -26,7 +28,7 @@ route.post('/signup', (req, res) => {
       ("aadhaar number is " + req.body.aadhaar + " and your otp is " + otp.otp),
       function (error, result) {
         if (error) {
-          console.log(error);
+          winston.log(error);
           res.send(error);
         } else {
           res.redirect('/login.html');
@@ -38,7 +40,7 @@ route.post('/signup', (req, res) => {
   // let x = new driver.Ed25519Keypair();
   // var pathName = req.body.aadhaar + '-' + Date.now() + path.extname(req.files.scan.name);
   // fs.writeFileSync(path.resolve('uploads') + '/' + pathName, req.files.scan.data, function(err){
-  //   return console.log(err);
+  //   return winston.log(err);
   // });
   //
   // let tx = driver.Transaction.makeCreateTransaction(
@@ -55,20 +57,27 @@ route.post('/signup', (req, res) => {
   // User.create({
   //   aadhaar: req.body.aadhaar,
   //   password: encrypt(req.body.password),
-  //   publicKey: x.publicKey,
-  //   privateKey: x.privateKey,
+  //   publicKey: encryptAes(x.publicKey),
+  //   privateKey: encryptAes(x.privateKey),
   //   latest:txSigned.id
   // }).then((user) => {
   //
   // })
 });
 
-route.post('/test', (req, res) => {
-  res.send(req.files.scan);
-  fs.writeFileSync(path.resolve('uploads') + '/' + req.files.scan.name, req.files.scan.data, function(err){
-    return console.log(err);
-  });
+route.get('/test', (req, res) => {
+  var x = "sf65ds4g6sf4fs54g6fs4bfs4b6dsf65g4dfs64g66dfb46dfs";
+  var code = encryptAes(x);
+  winston.log(code);
+  var text = decryptAes(code);
+  winston.log(text);
+  res.send("success");
 });
+
+route.get('/access', eli('/login.html'), (req, res) => {
+  res.send(decryptAes(req.user.privateKey));
+});
+
 
 route.post('/login', passport.authenticate('local', {
   successRedirect: '/profile.html',
@@ -84,7 +93,7 @@ route.get('/logout', (req, res) => {
 });
 
 route.get('/profile', eli('/login.html'), (req, res) => {
-  conn.listOutputs(req.user.publicKey, false).then(outputs => {
+  conn.listOutputs(decryptAes(req.user.publicKey), false).then(outputs => {
     transactions = [];
     for(each in outputs) {
       transactions.push(
@@ -102,18 +111,18 @@ route.get('/profile', eli('/login.html'), (req, res) => {
 route.post('/add', eli('/login.html'), (req, res) => {
   var pathName = req.user.aadhaar + '-' + Date.now() + path.extname(req.files.scan.name);
   fs.writeFileSync(path.resolve('uploads') + '/' + pathName, req.files.scan.data, function(err){
-    return console.log(err);
+    return winston.log(err);
   });
   let tx = driver.Transaction.makeCreateTransaction(
     { medic: req.body.mednote, imgUrl:pathName, datetime: new Date().toString() },
     { what: 'New transaction' },
     [ driver.Transaction.makeOutput(
-      driver.Transaction.makeEd25519Condition(req.user.publicKey))
+      driver.Transaction.makeEd25519Condition(decryptAes(req.user.publicKey)))
     ],
-    req.user.publicKey
+    decryptAes(req.user.publicKey)
   );
 
-  let txSigned = driver.Transaction.signTransaction(tx, req.user.privateKey);
+  let txSigned = driver.Transaction.signTransaction(tx, decryptAes(req.user.privateKey));
   conn.postTransaction(txSigned).then(() => {
     res.redirect("/profile.html");
   })

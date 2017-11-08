@@ -16,6 +16,18 @@ for (var k in envConfig) {
   process.env[k] = envConfig[k]
 }
 
+var winston = require('winston');
+require('winston-loggly-bulk');
+
+winston.add(winston.transports.Loggly, {
+  token: process.env.LOGGLY_TOKEN,
+  subdomain: process.env.LOGGLY_SUB,
+  tags: ["Winston-NodeJS"],
+  json:true
+});
+
+
+
 app.use(cors());
 app.use(fileUpload());
 app.use(bodyParser.json());
@@ -37,5 +49,5 @@ app.use('/', express.static(__dirname + "/public_static"));
 app.use('/images/', express.static(__dirname + "/uploads"));
 
 app.listen(8000, function () {
-  console.log("Server started on http://localhost:8000");
+  winston.log("Server started on http://localhost:8000");
 });

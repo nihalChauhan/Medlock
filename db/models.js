@@ -71,7 +71,7 @@ const OTP = db.define('otp', {
 });
 
 db.sync({force: false}).then(() => {
-  console.log('Database is synchronised');
+  winston.log('Database is synchronised');
 });
 
 module.exports = {
