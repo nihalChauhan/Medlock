@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dashboard</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script>
+        $(document).ready(function(){
+            $.ajax({
+                url: '/access',
+                type: 'get',
+                success: function(data) {
+                    $("#key").text(data.key);
+                }
+            });
+        });
+    </script>
+    <style>
+        *
+        {
+            box-sizing: border-box;
+        }
+        .header
+        {
+            border-bottom: 2px solid #e1e1e1;
+            margin-top: -20px;
+            padding:10px 30px;
+        }
+        .header a
+        {
+            float: right;
+            margin-top: 30px;
+        }
+        .header h1
+        {
+            color: #2273ff;
+            font-size: 50px;
+            font-family: "Century Schoolbook L";
+            margin-bottom: 0;
+            display: inline-block;
+        }
+        span
+        {
+            color: #ff1838;
+        }
+        .row
+        {
+            margin-top: 50px;
+        }
+        .col-md-12
+        {
+            height: 350px;
+        }
+        .section
+        {
+            width: 100%;
+            height:100%;
+            box-shadow: 0 0 5px 2px #e1e1e1;
+            padding: 10px;
+            position: relative;
+        }
+        .section div
+        {
+            width: 50%;
+            text-align: center;
+            margin: 120px auto;
+        }
+        #key
+        {
+            margin-top: 20px;
+            font-size: 17px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span>Med</span>Lock</h1>
+            <a class="btn btn-default" href="/logout">Sign Out</a>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="section">
+                    <div>
+                        <h3>Note down your <strong>Private Key</strong> and keep it safe</h3>
+                        <p id="key"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

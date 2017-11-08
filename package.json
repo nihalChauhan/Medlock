@@ -17,6 +17,7 @@
     "bcrypt": "^1.0.2",
     "bigchaindb-driver": "^0.3.0",
     "body-parser": "^1.17.2",
+    "console-control-strings": "^1.1.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.3",
     "dotenv": "^4.0.0",
