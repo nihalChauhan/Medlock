@@ -18,51 +18,55 @@ const conn = new driver.Connection('https://test.ipdb.io/api/v1/', {
   app_id: '4f4cf474',
   app_key: '33eb743338ab79e021a633fe21febc46'
 });
-
+route.post("/verify",(req,res)=>{
+  console.log(req.body.OTP);
+  console.log(req.body.aadhaar);
+});
 route.post('/signup', (req, res) => {
-  // OTP.create({
-  //   aadhaar: req.body.aadhaar,
-  //   otp: "080808"
-  // }).then((otp) => {
-  //   utilSMS.sendSMS("+919953442721",
-  //     ("aadhaar number is " + req.body.aadhaar + " and your otp is " + otp.otp),
-  //     function (error, result) {
-  //       if (error) {
-  //         winston.log(error);
-  //         res.send(error);
-  //       } else {
-  //         res.redirect('/login.html');
-  //       }
-  //     }
-  //   );
-  // });
-
-  let x = new driver.Ed25519Keypair();
-  var pathName = req.body.aadhaar + '-' + Date.now() + path.extname(req.files.scan.name);
-  fs.writeFileSync(path.resolve('uploads') + '/' + pathName, req.files.scan.data, function(err){
-    return winston.log(err);
+  console.log("done");
+  OTP.create({
+    aadhaar: req.body.aadhaar,
+    otp: "080808"
+  }).then((otp) => {
+    utilSMS.sendSMS("+919953442721",
+      ("aadhaar number is " + req.body.aadhaar + " and your otp is " + otp.otp),
+      function (error, result) {
+        if (error) {
+          winston.log(error);
+          res.send(error);
+        } else {
+          res.redirect('/login.html');
+        }
+      }
+    );
   });
 
-  let tx = driver.Transaction.makeCreateTransaction(
-    { medic: 'Initial entry', imgUrl:pathName, datetime: new Date().toString() },
-    { what: 'My first BigchainDB transaction' },
-    [ driver.Transaction.makeOutput(
-      driver.Transaction.makeEd25519Condition(x.publicKey))
-    ],
-    x.publicKey
-  );
-
-  let txSigned = driver.Transaction.signTransaction(tx, x.privateKey);
-  conn.postTransaction(txSigned);
-  User.create({
-    aadhaar: req.body.aadhaar,
-    password: encrypt(req.body.password),
-    publicKey: encryptAes(x.publicKey),
-    privateKey: encryptAes(x.privateKey),
-    latest:txSigned.id
-  }).then((user) => {
-      res.redirect('/login.html');
-  })
+  // let x = new driver.Ed25519Keypair();
+  // var pathName = req.body.aadhaar + '-' + Date.now() + path.extname(req.files.scan.name);
+  // fs.writeFileSync(path.resolve('uploads') + '/' + pathName, req.files.scan.data, function(err){
+  //   return winston.log(err);
+  // });
+  //
+  // let tx = driver.Transaction.makeCreateTransaction(
+  //   { medic: 'Initial entry', imgUrl:pathName, datetime: new Date().toString() },
+  //   { what: 'My first BigchainDB transaction' },
+  //   [ driver.Transaction.makeOutput(
+  //     driver.Transaction.makeEd25519Condition(x.publicKey))
+  //   ],
+  //   x.publicKey
+  // );
+  //
+  // let txSigned = driver.Transaction.signTransaction(tx, x.privateKey);
+  // conn.postTransaction(txSigned);
+  // User.create({
+  //   aadhaar: req.body.aadhaar,
+  //   password: encrypt(req.body.password),
+  //   publicKey: encryptAes(x.publicKey),
+  //   privateKey: encryptAes(x.privateKey),
+  //   latest:txSigned.id
+  // }).then((user) => {
+  //     res.redirect('/login.html');
+  // })
 });
 
 route.get('/test', (req, res) => {
