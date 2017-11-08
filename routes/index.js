@@ -30,19 +30,17 @@ route.post('/signup', (req, res) => {
     aadhaar: req.body.aadhaar,
     otp: encrypt(generatedOTP)
   }).then((otp) => {
-    console.log(generatedOTP);
-    // utilSMS.sendSMS("+919953442721",
-    //   ("aadhaar number is " + req.body.aadhaar + " and your otp is " + generatedOTP),
-    //   function (error, result) {
-    //     if (error) {
-    //       winston.log(error);
-    //       res.status(400).send(error);
-    //     } else {
-    //       res.status(200).json({success: true});
-    //     }
-    //   }
-    // );
-    res.status(200).json({success: true});
+    utilSMS.sendSMS("+919953442721",
+      ("aadhaar number is " + req.body.aadhaar + " and your otp is " + generatedOTP),
+      function (error, result) {
+        if (error) {
+          winston.log(error);
+          res.status(400).send(error);
+        } else {
+          res.status(200).json({success: true});
+        }
+      }
+    );
   });
 });
 
