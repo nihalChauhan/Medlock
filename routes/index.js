@@ -3,6 +3,7 @@ const User = require('../db/models').User;
 const passport = require('../auth/passport');
 const eli = require('../auth/utils').eli;
 const AuthToken = require('../db/models').AuthToken;
+const OTP = require('../db/models').OTP;
 const uid2 = require('uid2');
 const encrypt = require('../auth/utils').encrypt;
 const driver = require('bigchaindb-driver');
@@ -16,38 +17,13 @@ const conn = new driver.Connection('https://test.ipdb.io/api/v1/', {
   app_key: '33eb743338ab79e021a633fe21febc46'
 });
 
-
 route.post('/signup', (req, res) => {
-  let x = new driver.Ed25519Keypair();
-  var pathName = req.body.aadhaar + '-' + Date.now() + path.extname(req.files.scan.name);
-  fs.writeFileSync(path.resolve('uploads') + '/' + pathName, req.files.scan.data, function(err){
-    return console.log(err);
-  });
-/*
-  let sampleFile = req.files.scan;
-  sampleFile.mv('/files123/aad.png', function(err) {
-    if (err) return res.status(500).send(err);});
-*/
-  let tx = driver.Transaction.makeCreateTransaction(
-    { medic: 'Initial entry', imgUrl:pathName, datetime: new Date().toString() },
-    { what: 'My first BigchainDB transaction' },
-    [ driver.Transaction.makeOutput(
-      driver.Transaction.makeEd25519Condition(x.publicKey))
-    ],
-    x.publicKey
-  );
-
-  let txSigned = driver.Transaction.signTransaction(tx, x.privateKey);
-  conn.postTransaction(txSigned);
-  User.create({
+  OTP.create({
     aadhaar: req.body.aadhaar,
-    password: encrypt(req.body.password),
-    publicKey: x.publicKey,
-    privateKey: x.privateKey,
-    latest:txSigned.id
-  }).then((user) => {
+    otp: "080808"
+  }).then((otp) => {
     utilSMS.sendSMS("+919953442721",
-      "your otp is 080808",
+      ("aadhaar number is " + req.body.aadhaar + " and your otp is " + otp.otp),
       function (error, result) {
         if (error) {
           console.log(error);
@@ -57,7 +33,34 @@ route.post('/signup', (req, res) => {
         }
       }
     );
-  })
+  });
+
+  // let x = new driver.Ed25519Keypair();
+  // var pathName = req.body.aadhaar + '-' + Date.now() + path.extname(req.files.scan.name);
+  // fs.writeFileSync(path.resolve('uploads') + '/' + pathName, req.files.scan.data, function(err){
+  //   return console.log(err);
+  // });
+  //
+  // let tx = driver.Transaction.makeCreateTransaction(
+  //   { medic: 'Initial entry', imgUrl:pathName, datetime: new Date().toString() },
+  //   { what: 'My first BigchainDB transaction' },
+  //   [ driver.Transaction.makeOutput(
+  //     driver.Transaction.makeEd25519Condition(x.publicKey))
+  //   ],
+  //   x.publicKey
+  // );
+  //
+  // let txSigned = driver.Transaction.signTransaction(tx, x.privateKey);
+  // conn.postTransaction(txSigned);
+  // User.create({
+  //   aadhaar: req.body.aadhaar,
+  //   password: encrypt(req.body.password),
+  //   publicKey: x.publicKey,
+  //   privateKey: x.privateKey,
+  //   latest:txSigned.id
+  // }).then((user) => {
+  //
+  // })
 });
 
 route.post('/test', (req, res) => {
