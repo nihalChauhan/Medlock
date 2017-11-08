@@ -30,51 +30,51 @@ route.post('/signup', (req, res) => {
     aadhaar: req.body.aadhaar,
     otp: encrypt(generatedOTP)
   }).then((otp) => {
-    utilSMS.sendSMS("+919953442721",
-      ("aadhaar number is " + req.body.aadhaar + " and your otp is " + generatedOTP),
-      function (error, result) {
-        if (error) {
-          winston.log(error);
-          res.status(400).send(error);
-        } else {
-          res.status(200).json({success: true});
-        }
-      }
-    );
+    console.log(generatedOTP);
+    // utilSMS.sendSMS("+919953442721",
+    //   ("aadhaar number is " + req.body.aadhaar + " and your otp is " + generatedOTP),
+    //   function (error, result) {
+    //     if (error) {
+    //       winston.log(error);
+    //       res.status(400).send(error);
+    //     } else {
+    //       res.status(200).json({success: true});
+    //     }
+    //   }
+    // );
+    res.status(200).json({success: true});
   });
 });
 
 route.post('/verify', (req, res) => {
-  OTP.findOne({
-    aadhaar: req.body.aadhaar
-  }).then((otp) => {
+  OTP.findOne({ where: {aadhaar: req.body.aadhaar}}).then((otp) => {
     if (!otp) {
       res.redirect('/signup.html');
     } else {
-      if (decrypt(req.body.otp, otp.otp)) {
-        OTP.remove({aadhaar: req.body.aadhaar}, (err) => {
-          let x = new driver.Ed25519Keypair();
+      console.log(req.body);
+      if (decrypt(req.body.OTP, otp.otp)) {
+        otp.destroy();
+        let x = new driver.Ed25519Keypair();
 
-          let tx = driver.Transaction.makeCreateTransaction(
-              {medic: 'Initial entry', datetime: new Date().toString()},
-              {what: 'My first BigchainDB transaction'},
-              [driver.Transaction.makeOutput(
-                  driver.Transaction.makeEd25519Condition(x.publicKey))
-              ],
-              x.publicKey
-          );
+        let tx = driver.Transaction.makeCreateTransaction(
+            {medic: 'Initial entry', datetime: new Date().toString()},
+            {what: 'My first BigchainDB transaction'},
+            [driver.Transaction.makeOutput(
+                driver.Transaction.makeEd25519Condition(x.publicKey))
+            ],
+            x.publicKey
+        );
 
-          let txSigned = driver.Transaction.signTransaction(tx, x.privateKey);
-          conn.postTransaction(txSigned);
-          User.create({
-            aadhaar: req.body.aadhaar,
-            password: encrypt(req.body.password),
-            publicKey: encryptAes(x.publicKey),
-            privateKey: encryptAes(x.privateKey),
-            latest: txSigned.id
-          }).then((user) => {
-            res.redirect('/login.html');
-          });
+        let txSigned = driver.Transaction.signTransaction(tx, x.privateKey);
+        conn.postTransaction(txSigned);
+        User.create({
+          aadhaar: req.body.aadhaar,
+          password: encrypt(req.body.password),
+          publicKey: encryptAes(x.publicKey),
+          privateKey: encryptAes(x.privateKey),
+          latest: txSigned.id
+        }).then((user) => {
+          res.redirect('/login.html');
         });
       } else {
         res.redirect('/signup.html');
